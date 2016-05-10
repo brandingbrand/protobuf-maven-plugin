@@ -73,9 +73,13 @@ public abstract class AbstractProtocCompileMojo extends AbstractProtocMojo {
         projectHelper.addResource(project, getProtoSourceRoot().getAbsolutePath(),
                 ImmutableList.copyOf(getIncludes()), ImmutableList.copyOf(getExcludes()));
 
-        for (File source : getAdditionalProtoSourceRoots()) {
-            projectHelper.addResource(project, source.getAbsolutePath(),
-                    ImmutableList.copyOf(getIncludes()), ImmutableList.copyOf(getExcludes()));
+        final File[] additionalSources = getAdditionalProtoSourceRoots();
+
+        if (null != additionalSources) {
+            for (File source : additionalSources) {
+                projectHelper.addResource(project, source.getAbsolutePath(),
+                        ImmutableList.copyOf(getIncludes()), ImmutableList.copyOf(getExcludes()));
+            }
         }
     }
 
