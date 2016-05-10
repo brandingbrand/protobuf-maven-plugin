@@ -18,6 +18,7 @@ package org.xolstice.maven.plugin.protobuf;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -51,11 +52,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -216,6 +213,14 @@ abstract class AbstractProtocMojo extends AbstractMojo {
             required = false
     )
     private File[] additionalProtoPathElements = {};
+
+    /**
+     * Additional source roots for {@code .proto} definitions.
+     */
+    @Parameter(
+            required = false
+    )
+    private File[] additionalProtoSourceRoots = {};
 
     /**
      * Since {@code protoc} cannot access jars, proto files in dependencies are extracted to this location
@@ -435,10 +440,14 @@ abstract class AbstractProtocMojo extends AbstractMojo {
         }
 
         checkParameters();
-        final File protoSourceRoot = getProtoSourceRoot();
-        if (protoSourceRoot.exists()) {
+
+        final List<File> protoSources = Lists.newArrayList();
+        protoSources.add(getProtoSourceRoot());
+        protoSources.addAll(Arrays.asList(getAdditionalProtoSourceRoots()));
+
+        if (protoSources.size() > 0) {
             try {
-                final ImmutableSet<File> protoFiles = findProtoFilesInDirectory(protoSourceRoot);
+                final ImmutableSet<File> protoFiles = findProtoFilesInDirectories(protoSources);
                 final File outputDirectory = getOutputDirectory();
                 final ImmutableSet<File> outputFiles = findGeneratedFilesInDirectory(getOutputDirectory());
 
@@ -497,7 +506,7 @@ abstract class AbstractProtocMojo extends AbstractMojo {
 
                     final Protoc.Builder protocBuilder =
                             new Protoc.Builder(protocExecutable)
-                                    .addProtoPathElement(protoSourceRoot)
+                                    .addProtoPathElements(protoSources)
                                     .addProtoPathElements(derivedProtoPathElements)
                                     .addProtoPathElements(asList(additionalProtoPathElements))
                                     .addProtoFiles(protoFiles);
@@ -505,8 +514,8 @@ abstract class AbstractProtocMojo extends AbstractMojo {
                     final Protoc protoc = protocBuilder.build();
 
                     if (getLog().isDebugEnabled()) {
-                        getLog().debug("Proto source root:");
-                        getLog().debug(" " + protoSourceRoot);
+                        getLog().debug("Proto source roots:");
+                        getLog().debug(" " + protoSources);
 
                         if (derivedProtoPathElements != null && !derivedProtoPathElements.isEmpty()) {
                             getLog().debug("Derived proto paths:");
@@ -552,7 +561,7 @@ abstract class AbstractProtocMojo extends AbstractMojo {
             }
         } else {
             getLog().info(format("%s does not exist. Review the configuration or consider disabling the plugin.",
-                    protoSourceRoot));
+                    protoSources));
         }
     }
 
@@ -753,6 +762,8 @@ abstract class AbstractProtocMojo extends AbstractMojo {
     }
 
     protected abstract File getProtoSourceRoot();
+
+    protected abstract File[] getAdditionalProtoSourceRoots();
 
     protected Set<String> getIncludes() {
         return includes;
