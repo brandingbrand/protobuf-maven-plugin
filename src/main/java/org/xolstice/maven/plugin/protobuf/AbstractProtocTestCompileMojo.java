@@ -40,6 +40,14 @@ public abstract class AbstractProtocTestCompileMojo extends AbstractProtocMojo {
     private File protoTestSourceRoot;
 
     /**
+     * The additional source directories containing the test {@code .proto} definitions to be compiled.
+     */
+    @Parameter(
+            required = false
+    )
+    private File[] additionalProtoTestSourceRoots;
+
+    /**
      * This is the directory into which the (optional) descriptor set file will be created.
      *
      * @since 0.3.0
@@ -65,6 +73,15 @@ public abstract class AbstractProtocTestCompileMojo extends AbstractProtocMojo {
     protected void doAttachProtoSources() {
         projectHelper.addTestResource(project, getProtoSourceRoot().getAbsolutePath(),
                 ImmutableList.copyOf(getIncludes()), ImmutableList.copyOf(getExcludes()));
+
+        final File[] additionalSources = getAdditionalProtoSourceRoots();
+
+        if (null != additionalSources) {
+            for (File source : additionalSources) {
+                projectHelper.addResource(project, source.getAbsolutePath(),
+                        ImmutableList.copyOf(getIncludes()), ImmutableList.copyOf(getExcludes()));
+            }
+        }
     }
 
     @Override
@@ -92,4 +109,10 @@ public abstract class AbstractProtocTestCompileMojo extends AbstractProtocMojo {
     protected File getProtoSourceRoot() {
         return protoTestSourceRoot;
     }
+
+    @Override
+    protected File[] getAdditionalProtoSourceRoots() {
+        return additionalProtoTestSourceRoots;
+    }
 }
+
