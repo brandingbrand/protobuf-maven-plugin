@@ -76,29 +76,23 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <repository>
+            <id>bb.nexus.repo</id>
+            <url>https://nexus.brandingbrand.com/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>bb.nexus.repo.snapshots</id>
+            <url>https://nexus.brandingbrand.com/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <scm>
-        <url>https://github.com/xolstice/protobuf-maven-plugin</url>
-        <connection>scm:git:git://github.com/xolstice/protobuf-maven-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/xolstice/protobuf-maven-plugin.git</developerConnection>
+        <url>https://github.com/brandingbrand/protobuf-maven-plugin</url>
+        <connection>scm:git:git://github.com/brandingbrand/protobuf-maven-plugin</connection>
+        <developerConnection>scm:git:ssh://git@github.com/brandingbrand/protobuf-maven-plugin.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
-
-    <distributionManagement>
-        <downloadUrl>https://bintray.com/xolstice/maven/protobuf-maven-plugin/view</downloadUrl>
-        <site>
-            <!--
-                release:perform checks this element to determine whether site-deploy goal needs to be run.
-                The actual site deployment is done by GitHub site-maven-plugin, so the URL here is not used.
-            -->
-            <id>gh-pages</id>
-            <url>https://github.com/xolstice/protobuf-maven-plugin/tree/gh-pages</url>
-        </site>
-        <repository>
-            <id>bintray</id>
-            <name>Releases on Bintray</name>
-            <url>https://api.bintray.com/maven/xolstice/maven/protobuf-maven-plugin</url>
-        </repository>
-    </distributionManagement>
 
     <issueManagement>
         <system>Github</system>
